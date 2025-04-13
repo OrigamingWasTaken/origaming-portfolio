@@ -22,9 +22,9 @@ export interface WindowState {
 function centerWindow(windowId: string) {
   // Set default window sizes (can be adjusted as needed)
   const windowSizes = {
-    'terminal': { width: 1100, height: 850 },
+    'terminal': { width: 1100, height: 700 },
     'photos': { width: 700, height: 500 },
-    'info-txt': { width: 600, height: 450 },
+    'about-txt': { width: 600, height: 450 },
     'default': { width: 600, height: 450 }
   };
   

@@ -6,7 +6,7 @@
   let photos = [
     { id: 1, title: 'Basil', thumbnail: '', fullImage: '/basil.webp' },
     { id: 2, title: 'Lust', thumbnail: '', fullImage: '/lust.webp' },
-    { id: 3, title: 'Limbo', thumbnail: '', fullImage: '/greed.webp' },
+    { id: 3, title: 'Limbo', thumbnail: '', fullImage: '/limbo.webp' },
     { id: 4, title: 'Greed', thumbnail: '', fullImage: '/greed.webp' },
     { id: 5, title: 'Wrath', thumbnail: '', fullImage: '/wrath.webp' },
     { id: 6, title: 'Heresy', thumbnail: '', fullImage: '/heresy.webp' },
