@@ -33,7 +33,7 @@ const initialWindows: WindowState[] = [
 
 // Create the store
 function createWindowStore() {
-  const { subscribe, update } = writable<WindowState[]>(initialWindows);
+  const { subscribe, update, set } = writable<WindowState[]>(initialWindows);
   
   return {
     subscribe,
@@ -45,14 +45,15 @@ function createWindowStore() {
         
         if (existingWindow) {
           // If window exists, just open it and bring to front
+          const maxZ = Math.max(...windows.map(w => w.zIndex)) + 1;
           return windows.map(w => 
             w.id === id
-              ? { ...w, isOpen: true, isMinimized: false, zIndex: Math.max(...windows.map(w => w.zIndex)) + 1 }
+              ? { ...w, isOpen: true, isMinimized: false, zIndex: maxZ }
               : w
           );
         } else {
           // Create new window
-          const maxZ = windows.length ? Math.max(...windows.map(w => w.zIndex)) : 0;
+          const maxZ = windows.length ? Math.max(...windows.map(w => w.zIndex)) + 1 : 1;
           
           // Set position at top of screen with slight horizontal offset
           const horizontalOffset = windows.length * 35 % 200;
@@ -62,7 +63,7 @@ function createWindowStore() {
             isOpen: true,
             isMinimized: false,
             isMaximized: false,
-            zIndex: maxZ + 1,
+            zIndex: maxZ,
             position: { x: 100 + horizontalOffset, y: 40 },  // Fixed y position at top
             component,
             props
@@ -93,8 +94,8 @@ function createWindowStore() {
     
     bringToFront: (id: string) => {
       update(windows => {
-        const maxZ = Math.max(...windows.map(w => w.zIndex));
-        return windows.map(w => w.id === id ? { ...w, zIndex: maxZ + 1 } : w);
+        const maxZ = Math.max(...windows.map(w => w.zIndex)) + 1;
+        return windows.map(w => w.id === id ? { ...w, zIndex: maxZ } : w);
       });
     },
     

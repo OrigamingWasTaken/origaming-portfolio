@@ -3,7 +3,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [sveltekit()],
-  
+
   // Optimize build with specific options
   build: {
     // Add hash to file names for better caching
@@ -21,7 +21,12 @@ export default defineConfig({
     // Sourcemap for debugging
     sourcemap: true
   },
-  
+  resolve: {
+    alias: {
+      $lib: './frontend/src/lib',
+    },
+  },
+
   // Server configuration for development
   server: {
     // Auto-open the browser when starting dev server
@@ -29,13 +34,10 @@ export default defineConfig({
     // Enable hot module replacement
     hmr: true
   },
-  
+
   // Optimize dependencies
   optimizeDeps: {
     exclude: [], // Add packages that shouldn't be pre-bundled
     include: ['gsap', 'svelte-transition'] // Ensure these packages are pre-bundled
   },
-  
-  // CORS settings for development
-  cors: true
 });

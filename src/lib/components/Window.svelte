@@ -12,8 +12,8 @@
     let windowElement: HTMLElement;
     let headerElement: HTMLElement;
     let isDragging = false;
-    let dragOffset = { x: 0, y: 0 };
-    let originalPos = { ...position };
+    let startPos = { x: 0, y: 0 };
+    let startMousePos = { x: 0, y: 0 };
     
     const dispatch = createEventDispatcher();
     
@@ -23,20 +23,15 @@
       // Only initiate drag on left mouse button
       if (event.button !== 0) return;
       
+      // Bring window to front first
+      windowStore.bringToFront(id);
+      
+      // Set dragging state
       isDragging = true;
       
-      // Calculate the offset from cursor to the top-left corner of the window
-      const rect = windowElement.getBoundingClientRect();
-      dragOffset = {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
-      };
-      
-      // Store original position to prevent jumping
-      originalPos = { x: rect.left, y: rect.top };
-      
-      // Bring window to front
-      windowStore.bringToFront(id);
+      // Store start positions
+      startPos = { x: position.x, y: position.y };
+      startMousePos = { x: event.clientX, y: event.clientY };
       
       // Prevent text selection during drag
       event.preventDefault();
@@ -45,15 +40,16 @@
     function handleMouseMove(event: MouseEvent) {
       if (!isDragging) return;
       
-      // Calculate new position based on mouse movement
-      const newX = originalPos.x + (event.clientX - (originalPos.x + dragOffset.x));
-      const newY = originalPos.y + (event.clientY - (originalPos.y + dragOffset.y));
+      // Calculate delta from starting mouse position
+      const deltaX = event.clientX - startMousePos.x;
+      const deltaY = event.clientY - startMousePos.y;
+      
+      // Apply delta to starting window position
+      const newX = startPos.x + deltaX;
+      const newY = startPos.y + deltaY;
       
       // Update position in store
       windowStore.updatePosition(id, { x: newX, y: newY });
-      
-      // Update original position to prevent cumulative errors
-      originalPos = { x: newX, y: newY };
       
       // Prevent default to avoid text selection
       event.preventDefault();
@@ -266,5 +262,16 @@
       overflow: auto;
       position: relative;
       height: calc(100% - 38px);
+    }
+    
+    /* Responsive styles for mobile */
+    @media (max-width: 768px) {
+      .window {
+        min-width: 320px;
+        min-height: 300px;
+        max-width: 100vw;
+        max-height: 80vh;
+        width: 90vw !important;
+      }
     }
   </style>
