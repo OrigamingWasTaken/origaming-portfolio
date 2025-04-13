@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, afterUpdate } from "svelte";
   import { windowStore } from "$lib/store/appStore";
 
   // Tech stack data
@@ -42,8 +42,16 @@
   // Terminal interaction
   let inputCommand = "";
   let commandHistory: any[] = [];
-  let terminalElement: any;
-  let inputElement: any;
+  let terminalElement: HTMLElement;
+  let contentElement: HTMLElement;
+  let inputElement: HTMLInputElement;
+  let shouldScrollToBottom = true;
+
+  function scrollToBottom() {
+    if (shouldScrollToBottom && terminalElement) {
+      terminalElement.scrollTop = terminalElement.scrollHeight;
+    }
+  }
 
   function handleCommand(event) {
     if (event.key === "Enter" && inputCommand.trim()) {
@@ -96,6 +104,7 @@
         case "clear":
           commandHistory = [];
           inputCommand = "";
+          shouldScrollToBottom = true;
           return;
 
         case "silly":
@@ -134,12 +143,10 @@
 
       commandHistory = [...commandHistory, { cmd, output, isHtml }];
       inputCommand = "";
-
-      // Scroll to bottom
-      setTimeout(() => {
-        terminalElement.scrollTop = terminalElement.scrollHeight;
-        inputElement.focus();
-      }, 10);
+      shouldScrollToBottom = true;
+      
+      // Focus the input
+      inputElement.focus();
     }
   }
 
@@ -165,101 +172,125 @@
     inputElement.focus();
   }
 
+  function handleScroll() {
+    // Determine if user has scrolled away from bottom
+    const isAtBottom = Math.abs(
+      (terminalElement.scrollHeight - terminalElement.scrollTop) -
+      terminalElement.clientHeight
+    ) < 10;
+    
+    // Only auto-scroll if user is already at the bottom
+    shouldScrollToBottom = isAtBottom;
+  }
+
+  // Scroll to bottom after updates
+  afterUpdate(() => {
+    scrollToBottom();
+  });
+
   onMount(() => {
+    // Add scroll event listener
+    terminalElement.addEventListener('scroll', handleScroll);
+    
+    // Initial scroll to bottom and focus
     setTimeout(() => {
+      scrollToBottom();
       inputElement.focus();
-      // Initial scroll to bottom to show content
-      terminalElement.scrollTop = terminalElement.scrollHeight;
     }, 0);
+
+    return () => {
+      // Clean up event listener
+      terminalElement.removeEventListener('scroll', handleScroll);
+    };
   });
 </script>
 
 <div class="terminal-container">
-  <div
-    class="terminal-content"
-    bind:this={terminalElement}
-    on:click={focusInput}
-  >
-    <div class="command-line">
-      <span class="prompt">~/origaming $</span>
-      <span class="command"> echo "Welcome to my code realm"</span>
-    </div>
-    <div class="output welcome">Welcome to My Code Realm</div>
-
-    <div class="command-line">
-      <span class="prompt">~/origaming $</span>
-      <span class="command"> cat about.txt</span>
-    </div>
-    <div class="output about">
-      <p>
-        I'm Origaming (she/he) and I am a passionate fullstack developer! I know TypeScript, Bash, and Python, and hope to learn <span class="emoji"
-          >🦀</span
-        > Rust <br>in the future.
-But coding and solving problems is not my only passion. I also love playing the drums and cycling ^_^.
-      </p>
-    </div>
-
-    <div class="command-line">
-      <span class="prompt">~/origaming $</span>
-      <span class="command"> ls tech-stack/</span>
-    </div>
-    <div class="output">
-      <div class="tech-stack">
-        {#each techStack as tech}
-          <span class="tech-badge" data-category={tech.category}
-            >{tech.name}</span
-          >
-        {/each}
-      </div>
-    </div>
-
-    <div class="command-line">
-      <span class="prompt">~/origaming $</span>
-      <span class="command"> ls projects/</span>
-    </div>
-    <div class="output">
-      <div class="projects">
-        {#each projects as project}
-          <div class="project-card">
-            <h3>{project.title}</h3>
-            <p>{project.description}</p>
-            <div class="project-techs">
-              {#each project.techs as tech}
-                <span class="tech-tag">{tech}</span>
-              {/each}
-            </div>
-            <a href={project.repoUrl} target="_blank" rel="noopener noreferrer"
-              >View on GitHub →</a
-            >
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    <div class="command-line">
-      <span class="prompt">~/origaming $</span>
-      <span class="command"> echo "Type 'help' for available commands"</span>
-    </div>
-    <div class="output tip">Type 'help' for available commands</div>
-
-    {#each commandHistory as entry}
+  <div class="terminal-scrollable" bind:this={terminalElement}>
+    <div class="terminal-content" bind:this={contentElement}>
       <div class="command-line">
-        <span class="prompt">~/origaming $</span>
-        <span class="command"> {entry.cmd}</span>
+        <span class="prompt">~/origaming$</span>
+        <span class="command"> echo "Welcome to my code realm"</span>
+      </div>
+      <div class="output welcome">Welcome to My Code Realm</div>
+
+      <div class="command-line">
+        <span class="prompt">~/origaming$</span>
+        <span class="command"> cat about.txt</span>
+      </div>
+      <div class="output about">
+        <p>
+          I'm Origaming (she/he) and I am a passionate fullstack developer! I know TypeScript, Bash, and Python, and hope to learn <span class="emoji"
+            >🦀</span
+          > Rust <br>in the future.
+  But coding and solving problems is not my only passion. I also love playing the drums and cycling ^_^.
+        </p>
+      </div>
+
+      <div class="command-line">
+        <span class="prompt">~/origaming$</span>
+        <span class="command"> ls tech-stack/</span>
       </div>
       <div class="output">
-        {#if entry.isHtml}
-          {@html entry.output}
-        {:else}
-          {#each entry.output.split("\n") as line}
-            <div>{line}</div>
+        <div class="tech-stack">
+          {#each techStack as tech}
+            <span class="tech-badge" data-category={tech.category}
+              >{tech.name}</span
+            >
           {/each}
-        {/if}
+        </div>
       </div>
-    {/each}
 
-    <div class="command-line input-line">
-      <span class="prompt">~/origaming $</span>
+      <div class="command-line">
+        <span class="prompt">~/origaming$</span>
+        <span class="command"> ls projects/</span>
+      </div>
+      <div class="output">
+        <div class="projects">
+          {#each projects as project}
+            <div class="project-card">
+              <h3>{project.title}</h3>
+              <p>{project.description}</p>
+              <div class="project-techs">
+                {#each project.techs as tech}
+                  <span class="tech-tag">{tech}</span>
+                {/each}
+              </div>
+              <a href={project.repoUrl} target="_blank" rel="noopener noreferrer"
+                >View on GitHub →</a
+              >
+            </div>
+          {/each}
+        </div>
+      </div>
+
+      <div class="command-line">
+        <span class="prompt">~/origaming$</span>
+        <span class="command"> echo "Type 'help' for available commands"</span>
+      </div>
+      <div class="output tip">Type 'help' for available commands</div>
+
+      {#each commandHistory as entry}
+        <div class="command-line">
+          <span class="prompt">~/origaming$</span>
+          <span class="command"> {entry.cmd}</span>
+        </div>
+        <div class="output">
+          {#if entry.isHtml}
+            {@html entry.output}
+          {:else}
+            {#each entry.output.split("\n") as line}
+              <div>{line}</div>
+            {/each}
+          {/if}
+        </div>
+      {/each}
+    </div>
+  </div>
+
+  <div class="terminal-input" on:click={focusInput}>
+    <div class="input-wrapper">
+      <span class="prompt">~/origaming$</span>
       <input
         type="text"
         bind:value={inputCommand}
@@ -279,16 +310,32 @@ But coding and solving problems is not my only passion. I also love playing the 
     background-color: var(--bg-secondary);
     display: flex;
     flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .terminal-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
   }
 
   .terminal-content {
     padding: 1rem;
-    height: 100%;
-    overflow-y: auto;
     font-family: "JetBrains Mono", monospace;
     background-color: var(--bg-secondary);
-    display: flex;
-    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .terminal-input {
+    border-top: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-secondary);
+    font-family: "JetBrains Mono", monospace;
   }
 
   .command-line {
@@ -297,18 +344,24 @@ But coding and solving problems is not my only passion. I also love playing the 
     font-size: 0.9rem;
   }
 
-  .input-line {
-    margin-bottom: 0;
+  .input-wrapper {
+    display: flex;
+    width: 100%;
+    align-items: center;
   }
 
   .prompt {
     color: var(--accent-primary);
     margin-right: 0.5rem;
     white-space: nowrap;
+    flex-shrink: 0;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: normal;
   }
 
   .command {
     color: var(--text-primary);
+    word-break: break-all;
   }
 
   input {
@@ -320,6 +373,8 @@ But coding and solving problems is not my only passion. I also love playing the 
     flex: 1;
     outline: none;
     width: 100%;
+    caret-color: var(--text-primary);
+    min-width: 10px;
   }
 
   .output {
@@ -328,6 +383,8 @@ But coding and solving problems is not my only passion. I also love playing the 
     color: var(--text-secondary);
     font-size: 0.9rem;
     white-space: pre-wrap;
+    overflow-wrap: break-word;
+    max-width: 100%;
   }
 
   .welcome {
@@ -380,6 +437,7 @@ But coding and solving problems is not my only passion. I also love playing the 
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1rem;
     margin: 0.5rem 0;
+    width: 100%;
   }
 
   .project-card {
@@ -452,6 +510,23 @@ But coding and solving problems is not my only passion. I also love playing the 
 
     .tech-stack {
       flex-wrap: wrap;
+    }
+    
+    .terminal-content {
+      padding: 0.75rem;
+    }
+    
+    .command-line, input {
+      font-size: 0.8rem;
+    }
+    
+    .output {
+      font-size: 0.8rem;
+      padding-left: 0.5rem;
+    }
+    
+    .welcome {
+      font-size: 1.2rem;
     }
   }
 </style>

@@ -1,3 +1,4 @@
+// src/lib/store/appStore.ts
 import { writable } from 'svelte/store';
 
 export interface Position {
@@ -17,6 +18,30 @@ export interface WindowState {
   props?: Record<string, any>;
 }
 
+// Helper function to center a window on the screen
+function centerWindow(windowId: string) {
+  // Set default window sizes (can be adjusted as needed)
+  const windowSizes = {
+    'terminal': { width: 1100, height: 850 },
+    'photos': { width: 700, height: 500 },
+    'info-txt': { width: 600, height: 450 },
+    'default': { width: 600, height: 450 }
+  };
+  
+  // Get window size
+  const size = windowSizes[windowId] || windowSizes['default'];
+  
+  // Calculate viewport dimensions
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+  const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+  
+  // Calculate center position
+  const x = Math.max(0, Math.floor((viewportWidth - size.width) / 2));
+  const y = Math.max(0, Math.floor((viewportHeight - size.height) / 2) - 20); // Slight offset to account for top bar
+  
+  return { x, y };
+}
+
 // Initial window states
 const initialWindows: WindowState[] = [
   {
@@ -26,7 +51,7 @@ const initialWindows: WindowState[] = [
     isMinimized: false,
     isMaximized: false,
     zIndex: 1,
-    position: { x: 80, y: 40 },
+    position: centerWindow('terminal'),
     component: 'TerminalApp'
   }
 ];
@@ -55,8 +80,9 @@ function createWindowStore() {
           // Create new window
           const maxZ = windows.length ? Math.max(...windows.map(w => w.zIndex)) + 1 : 1;
           
-          // Set position at top of screen with slight horizontal offset
-          const horizontalOffset = windows.length * 35 % 200;
+          // Center the window on the screen
+          const position = centerWindow(id);
+          
           const newWindow: WindowState = {
             id,
             title,
@@ -64,7 +90,7 @@ function createWindowStore() {
             isMinimized: false,
             isMaximized: false,
             zIndex: maxZ,
-            position: { x: 100 + horizontalOffset, y: 40 },  // Fixed y position at top
+            position,
             component,
             props
           };
