@@ -1,0 +1,59 @@
+:root {
+    /* Dark theme (default) - Softer, pinker palette */
+    --dark-bg-primary: #1e1a2b;
+    --dark-bg-secondary: #2d2b40;
+    --dark-bg-tertiary: #3b3450;
+    --dark-text-primary: #f0e6ef;
+    --dark-text-secondary: #c8b6c6;
+    --dark-text-heading: #f8ecf4;
+    --dark-accent-primary: #f7aec5;  /* Softer pink */
+    --dark-accent-secondary: #f4b8d1; /* Lighter pink */
+    --dark-accent-tertiary: #cfbae1;  /* Soft lavender */
+    --dark-accent-quaternary: #d9c1e5; /* Light lavender */
+    --dark-card-shadow: rgba(0, 0, 0, 0.3);
+    --dark-border-color: #423a5a;
+  
+    /* Light theme - Even lighter, pastel pinks */
+    --light-bg-primary: #fbf7fa;
+    --light-bg-secondary: #ffffff;
+    --light-bg-tertiary: #f9f0f5;
+    --light-text-primary: #3d3548;
+    --light-text-secondary: #6e6282;
+    --light-text-heading: #35293f;
+    --light-accent-primary: #f7aec5;  /* Matching pink */
+    --light-accent-secondary: #f4c3d7; /* Softer pink */
+    --light-accent-tertiary: #d4bfea;  /* Light lavender */
+    --light-accent-quaternary: #e2d3ef; /* Softer lavender */
+    --light-card-shadow: rgba(0, 0, 0, 0.08);
+    --light-border-color: #f2dce7;
+  
+    /* Default theme (dark) */
+    --bg-primary: var(--dark-bg-primary);
+    --bg-secondary: var(--dark-bg-secondary);
+    --bg-tertiary: var(--dark-bg-tertiary);
+    --text-primary: var(--dark-text-primary);
+    --text-secondary: var(--dark-text-secondary);
+    --text-heading: var(--dark-text-heading);
+    --accent-primary: var(--dark-accent-primary);
+    --accent-secondary: var(--dark-accent-secondary);
+    --accent-tertiary: var(--dark-accent-tertiary);
+    --accent-quaternary: var(--dark-accent-quaternary);
+    --card-shadow: var(--dark-card-shadow);
+    --border-color: var(--dark-border-color);
+  }
+  
+  /* Light theme class */
+  .light-theme {
+    --bg-primary: var(--light-bg-primary);
+    --bg-secondary: var(--light-bg-secondary);
+    --bg-tertiary: var(--light-bg-tertiary);
+    --text-primary: var(--light-text-primary);
+    --text-secondary: var(--light-text-secondary);
+    --text-heading: var(--light-text-heading);
+    --accent-primary: var(--light-accent-primary);
+    --accent-secondary: var(--light-accent-secondary);
+    --accent-tertiary: var(--light-accent-tertiary);
+    --accent-quaternary: var(--light-accent-quaternary);
+    --card-shadow: var(--light-card-shadow);
+    --border-color: var(--light-border-color);
+  }
