@@ -302,7 +302,7 @@ Available commands:
     {#if !userCanType}
       <div class="input-overlay">
         {#if isAnimating}
-          <span>Terminal is initializing...</span>
+          <span></span>
         {:else}
           <span>Click to interact with the terminal</span>
         {/if}
