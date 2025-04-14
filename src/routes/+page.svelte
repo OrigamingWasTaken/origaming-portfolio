@@ -14,16 +14,9 @@
   let windows: WindowState[] = [];
 
   // File content for about.txt (renamed from info.txt)
-  const aboutTxtContent = `# Origaming (she/he)
-
-## About Me
-I'm a passionate developer who loves building anything and everything. 
-I know Java/TypeScript, Python, Lua, and I'm currently learning Rust.
-When I'm not coding, I enjoy playing the drums and cycling 🥁.
-
-## Contact
-You can reach my at contact@origaming.ch
-`;
+  const aboutTxtContent = `I'm Origaming (she/he) and I am a passionate fullstack developer! I know TypeScript, Bash, and Python, and hope to learn 🦀 Rust 
+in the future.
+But coding and solving problems is not my only passion. I also love playing the drums and cycling ^_^.`;
 
   onMount(() => {
     const unsubscribe = windowStore.subscribe((value) => {

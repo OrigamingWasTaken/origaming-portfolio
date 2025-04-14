@@ -33,7 +33,8 @@
     },
     {
       title: "paper-comet",
-      description: "A basic addon for the Minecraft 'Meteor Client' mod made for me to learn Java.",
+      description:
+        "A basic addon for the Minecraft 'Meteor Client' mod made for me to learn Java.",
       repoUrl: "https://github.com/OrigamingWasTaken/paper-comet",
       techs: ["Java", "Fabric", "Gradle", "Mixins"],
     },
@@ -51,11 +52,12 @@
 
   // Animation sequence
   const animationSequence = [
-    { command: "echo \"Welcome to my code realm\"", delay: 300 },
+    { command: 'echo "Welcome to my code realm"', delay: 300 },
     { command: "cat about.txt", delay: 500 },
     { command: "skills", delay: 500 },
     { command: "projects", delay: 500 },
-    { command: "echo \"Type 'help' for available commands\"", delay: 300 }
+    { command: "contact", delay: 500 },
+    { command: "echo \"Type 'help' for available commands\"", delay: 300 },
   ];
 
   function scrollToBottom() {
@@ -66,35 +68,35 @@
 
   async function simulateTyping(command: string) {
     inputCommand = "";
-    
+
     const typingSpeed = 20;
     const randomVariation = 10;
-    
+
     for (let i = 0; i < command.length; i++) {
       inputCommand += command[i];
-      await new Promise(resolve => 
-        setTimeout(resolve, typingSpeed + Math.random() * randomVariation)
+      await new Promise((resolve) =>
+        setTimeout(resolve, typingSpeed + Math.random() * randomVariation),
       );
     }
-    
-    await new Promise(resolve => setTimeout(resolve, 100));
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
     handleCommand({ key: "Enter" } as KeyboardEvent);
   }
 
   async function runAnimationSequence() {
     isAnimating = true;
     userCanType = false;
-    
+
     commandHistory = [];
-    
+
     for (const item of animationSequence) {
       await simulateTyping(item.command);
-      await new Promise(resolve => setTimeout(resolve, item.delay));
+      await new Promise((resolve) => setTimeout(resolve, item.delay));
     }
-    
+
     isAnimating = false;
     userCanType = true;
-    
+
     inputCommand = "";
     setTimeout(() => {
       if (inputElement) {
@@ -107,7 +109,7 @@
     if (!userCanType && !isAnimating) {
       return;
     }
-    
+
     if (event.key === "Enter" && inputCommand.trim()) {
       const cmd = inputCommand.trim();
 
@@ -127,6 +129,8 @@ Available commands:
   weather   - Current mood forecast
   whoami    - Who am I?
   open      - Open an application (e.g., open photos)
+  cat       - Show the content of a file
+  echo      - Print the given string
 `;
           break;
 
@@ -136,16 +140,21 @@ Available commands:
           break;
 
         case "skills":
-          output = "My technical skills:\n" + 
+          output =
+            "My technical skills:\n" +
             techStack.map((tech) => `• ${tech.name}`).join("\n");
           break;
 
         case "projects":
           isHtml = true;
-          output = "My projects:\n" + 
-            projects.map((p) => 
-              `• <a href="${p.repoUrl}" target="_blank" rel="noopener noreferrer" class="project-link">${p.title}</a> - ${p.description}`
-            ).join("\n");
+          output =
+            "My projects:\n" +
+            projects
+              .map(
+                (p) =>
+                  `• <a href="${p.repoUrl}" target="_blank" rel="noopener noreferrer" class="project-link">${p.title}</a> - ${p.description}`,
+              )
+              .join("\n");
           break;
 
         case "contact":
@@ -189,11 +198,13 @@ Available commands:
           output =
             "I'm Origaming (she/he) and I am a passionate fullstack developer! I know TypeScript, Bash, and Python, and hope to learn 🦀 Rust \nin the future.\nBut coding and solving problems is not my only passion. I also love playing the drums and cycling ^_^.";
           break;
-
-        case "echo \"Welcome to my code realm\"":
+        case "cat":
+          output = "cat <file>";
+          break;
+        case 'echo "Welcome to my code realm"':
           output = "Welcome to My Code Realm";
           break;
-          
+
         case "echo \"Type 'help' for available commands\"":
           output = "Type 'help' for available commands";
           break;
@@ -203,6 +214,8 @@ Available commands:
             output = `Application "${cmd.substring(5)}" not found. Try "open photos"`;
           } else if (cmd.startsWith("echo ")) {
             output = cmd.substring(5).replace(/^"(.*)"$/, "$1");
+          } else if (cmd.startsWith("cat")) {
+            output = `cat: ${cmd.split(" ")[1]}: No such file or directory`;
           } else {
             output = `Command not found: ${cmd}. Type 'help' for a list of commands.`;
           }
@@ -211,7 +224,7 @@ Available commands:
       commandHistory = [...commandHistory, { cmd, output, isHtml }];
       inputCommand = "";
       shouldScrollToBottom = true;
-      
+
       if (userCanType) {
         inputElement.focus();
       }
@@ -242,11 +255,13 @@ Available commands:
   }
 
   function handleScroll() {
-    const isAtBottom = Math.abs(
-      (terminalElement.scrollHeight - terminalElement.scrollTop) -
-      terminalElement.clientHeight
-    ) < 10;
-    
+    const isAtBottom =
+      Math.abs(
+        terminalElement.scrollHeight -
+          terminalElement.scrollTop -
+          terminalElement.clientHeight,
+      ) < 10;
+
     shouldScrollToBottom = isAtBottom;
   }
 
@@ -255,11 +270,11 @@ Available commands:
   });
 
   onMount(() => {
-    terminalElement.addEventListener('scroll', handleScroll);
+    terminalElement.addEventListener("scroll", handleScroll);
     runAnimationSequence();
-    
+
     return () => {
-      terminalElement.removeEventListener('scroll', handleScroll);
+      terminalElement.removeEventListener("scroll", handleScroll);
     };
   });
 </script>
@@ -346,7 +361,7 @@ Available commands:
     font-family: "JetBrains Mono", monospace;
     position: relative;
   }
-  
+
   .terminal-input.disabled {
     opacity: 0.8;
   }
@@ -389,26 +404,31 @@ Available commands:
     caret-color: var(--text-primary);
     min-width: 10px;
   }
-  
+
   input:disabled {
     cursor: default;
   }
-  
+
   .blinking-cursor {
     caret-color: transparent;
   }
-  
+
   .blinking-cursor::after {
-    content: '|';
+    content: "|";
     animation: blink 1s step-end infinite;
     color: var(--text-primary);
   }
-  
+
   @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
+    from,
+    to {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
   }
-  
+
   .input-overlay {
     position: absolute;
     top: 0;
@@ -433,13 +453,13 @@ Available commands:
     overflow-wrap: break-word;
     max-width: 100%;
   }
-  
+
   .project-link {
     color: var(--accent-primary);
     text-decoration: none;
     transition: color 0.2s ease;
   }
-  
+
   .project-link:hover {
     color: var(--accent-secondary);
     text-decoration: underline;
@@ -457,11 +477,12 @@ Available commands:
     .terminal-content {
       padding: 0.75rem;
     }
-    
-    .command-line, input {
+
+    .command-line,
+    input {
       font-size: 0.8rem;
     }
-    
+
     .output {
       font-size: 0.8rem;
       padding-left: 0.5rem;
